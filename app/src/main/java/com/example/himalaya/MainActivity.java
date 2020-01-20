@@ -64,6 +64,7 @@ public class MainActivity extends FragmentActivity {
 
         //封装一层
         CommonNavigator commonNavigator = new CommonNavigator(this);
+        commonNavigator.setAdjustMode(true); //自我调节平分他们的一个位置
         commonNavigator.setAdapter(mIndicatorAdapter);
         //设置要显示的内容
 
