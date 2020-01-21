@@ -26,6 +26,6 @@ public class BaseApplication extends Application {
         //初始化LogUtils
         //更改等级，使log不会被看到
        // LogUtil.init(this.getPackageName(), false);
-        LogUtil.init(this.getPackageName(), true);
+        LogUtil.init(this.getPackageName(), false);
     }
 }
