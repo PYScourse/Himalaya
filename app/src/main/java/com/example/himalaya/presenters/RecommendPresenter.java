@@ -57,6 +57,7 @@ public class RecommendPresenter implements IRecommendPresenter {
         //为了使内容返回进来要注册一个接口进来
         //获取推荐内容
         //封装参数
+        updateLoading();
         Map<String, String> map = new HashMap<>();
         //这个数据表示一页参数返回多少条
         map.put(DTransferConstants.LIKE_COUNT, Constants.RECOMMEND_COUNT + "");//转化成字符串
@@ -80,18 +81,40 @@ public class RecommendPresenter implements IRecommendPresenter {
                 //这里是数据获取出错
                 LogUtil.d(TAG, "error  -- >  " + i);
                 LogUtil.d(TAG, "errorMsg  -- >  " + s);
+                handlerError();
             }
         });
     }
 
+    private void handlerError() {
+        if (mCallbacks != null) {
+            for (IRecommendViewCallback callback : mCallbacks) {
+                callback.onNetworkError();//把albumList传出去
+            }
+        }
+    }
 
 
     private void handlerRecommendResult(List<Album> albumList) {
         //通知UI更新
-        if (mCallbacks != null) {
-            for (IRecommendViewCallback callback : mCallbacks) {
-                callback.onRecommendListLoaded(albumList);//把albumList传出去
+        if (albumList != null) {
+            if (albumList.size() == 0) {
+                //判断数据为空
+                for (IRecommendViewCallback callback : mCallbacks) {
+                    callback.onEmpty();//把albumList传出去
+                }
+            }else {
+                for (IRecommendViewCallback callback : mCallbacks) {
+                    callback.onRecommendListLoaded(albumList);//把albumList传出去
+                }
             }
+        }
+    }
+
+
+    private void updateLoading(){
+        for (IRecommendViewCallback callback : mCallbacks) {
+            callback.onLoading();//把albumList传出去
         }
     }
 

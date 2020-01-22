@@ -1,12 +1,20 @@
 package com.example.himalaya.base;
 
 import android.app.Application;
+import android.os.Handler;
 
 import com.example.himalaya.utils.LogUtil;
 import com.ximalaya.ting.android.opensdk.constants.DTransferConstants;
 import com.ximalaya.ting.android.opensdk.datatrasfer.CommonRequest;
 
+
+
 public class BaseApplication extends Application {
+
+    //创建一个通用的handler
+    private static Handler sHandler = null;
+
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -27,5 +35,12 @@ public class BaseApplication extends Application {
         //更改等级，使log不会被看到
        // LogUtil.init(this.getPackageName(), false);
         LogUtil.init(this.getPackageName(), false);
+
+        //然后在create的时候我们创建
+        sHandler = new Handler();
+    }
+
+    public static Handler getHandler(){
+      return sHandler;
     }
 }
