@@ -2,6 +2,7 @@ package com.example.himalaya.adapters;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,9 @@ import java.util.List;
 public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdapter.InnerHolder> {
 
     private  List<Album> mData = new ArrayList<>();
+    private static final String TAG = "RecommendListAdapter";
+    private OnRecommendItemClickListener mItemClickListener = null;
+
     @NonNull
     @Override
     public InnerHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -29,9 +33,23 @@ public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdap
     }
 
     @Override
-    public void onBindViewHolder(@NonNull InnerHolder holder, int position) {
+    public void onBindViewHolder(@NonNull InnerHolder holder, final int position) {
         //在这里设置数据
         holder.itemView.setTag(position);//把当前的位置设置给item,所有的View都有setTag的方法的
+        //在这里面设置点击事件，通过item
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mItemClickListener != null) {
+                    int clickPosition = (int) v.getTag();
+                    mItemClickListener.onItemClick(clickPosition,mData.get(clickPosition));
+
+                }
+                //设置log,观察点击的对不对
+                Log.d(TAG, "  holder.itemView   click ---> " + v.getTag());
+            }
+        });
+        //在这里加上一个值
         holder.setData(mData.get(position));
     }
 
@@ -81,5 +99,11 @@ public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdap
 
             Picasso.with(itemView.getContext()).load(album.getCoverUrlLarge()).into(albumCoverTv);
         }
+    }
+    public void setOnRecommendItemClickListener(OnRecommendItemClickListener listener){
+        this.mItemClickListener = listener;
+    }
+    public interface OnRecommendItemClickListener{
+        void onItemClick(int position, Album album);//把位置传出去
     }
 }

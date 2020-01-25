@@ -1,34 +1,29 @@
 package com.example.himalaya.fragments;
 
+import android.content.Intent;
 import android.graphics.Rect;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.himalaya.DetailActivity;
 import com.example.himalaya.R;
 import com.example.himalaya.adapters.RecommendListAdapter;
 import com.example.himalaya.base.BaseFragment;
 import com.example.himalaya.interfaces.IRecommendViewCallback;
+import com.example.himalaya.presenters.AlbumDetailPresenter;
 import com.example.himalaya.presenters.RecommendPresenter;
-import com.example.himalaya.utils.Constants;
 import com.example.himalaya.utils.LogUtil;
 import com.example.himalaya.views.UILoader;
-import com.ximalaya.ting.android.opensdk.constants.DTransferConstants;
-import com.ximalaya.ting.android.opensdk.datatrasfer.CommonRequest;
-import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
-import com.ximalaya.ting.android.opensdk.model.album.GussLikeAlbumList;
 
 import net.lucode.hackware.magicindicator.buildins.UIUtil;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class RecommendFragment extends BaseFragment implements IRecommendViewCallback, UILoader.OnRetryClickListener {
+public class RecommendFragment extends BaseFragment implements IRecommendViewCallback, UILoader.OnRetryClickListener, RecommendListAdapter.OnRecommendItemClickListener {
 
     private static final String TAG = "RecommendFragment";
     private View mRootView;
@@ -46,7 +41,6 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
                 return createSuccessView(layoutInflater, container);
             }
         };
-
 
 
         //去拿数据回来
@@ -83,11 +77,11 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
         mRecommendRv.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-                outRect.bottom = UIUtil.dip2px(view.getContext(),5);
+                outRect.bottom = UIUtil.dip2px(view.getContext(), 5);
                 //dp -> px
-                outRect.top = UIUtil.dip2px(view.getContext(),5);//magicindicator.buildins,一个工具类
-                outRect.left = UIUtil.dip2px(view.getContext(),5);
-                outRect.right = UIUtil.dip2px(view.getContext(),5);
+                outRect.top = UIUtil.dip2px(view.getContext(), 5);//magicindicator.buildins,一个工具类
+                outRect.left = UIUtil.dip2px(view.getContext(), 5);
+                outRect.right = UIUtil.dip2px(view.getContext(), 5);
 
             }
         });
@@ -95,6 +89,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
         //3.设置适配器
         mRecommendListAdapter = new RecommendListAdapter();//设置为成员变量，等会要设置数据
         mRecommendRv.setAdapter(mRecommendListAdapter);
+        mRecommendListAdapter.setOnRecommendItemClickListener(this);//让这个类实现当前这个接口
         return mRootView;
 
     }
@@ -102,7 +97,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
 
     @Override
     public void onRecommendListLoaded(List<Album> result) {
-        LogUtil.d(TAG,"onRecommendListLoaded");
+        LogUtil.d(TAG, "onRecommendListLoaded");
         //当我们获取推荐内容的时候，这个方法就会被调用(成功了)
         //数据回来以后，就是更新UI了
         //这里需要把数据和UI结合起来，把View设置成成员变量
@@ -113,19 +108,19 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
 
     @Override
     public void onNetworkError() {
-        LogUtil.d(TAG,"onNetworkError");
+        LogUtil.d(TAG, "onNetworkError");
         mUiLoader.updateStatus(UILoader.UIStatus.NETWORK_ERROR);
     }
 
     @Override
     public void onEmpty() {
-        LogUtil.d(TAG,"onEmpty");
+        LogUtil.d(TAG, "onEmpty");
         mUiLoader.updateStatus(UILoader.UIStatus.EMPTY);
     }
 
     @Override
     public void onLoading() {
-        LogUtil.d(TAG,"onLoading");
+        LogUtil.d(TAG, "onLoading");
         mUiLoader.updateStatus(UILoader.UIStatus.LOADING);
     }
 
@@ -146,5 +141,14 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
         if (mRecommendPresenter != null) {
             mRecommendPresenter.getRecommendList();
         }
+    }
+
+    @Override
+    public void onItemClick(int position, Album album) {
+        //根据位置拿到数据
+        AlbumDetailPresenter.getInstance().setTargetAlbum(album);
+        //item被点击了,跳转到详情界面,之后就要绑定回调接口
+        Intent intent = new Intent(getContext(), DetailActivity.class);
+        startActivity(intent);
     }
 }

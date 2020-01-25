@@ -89,41 +89,36 @@ public abstract class UILoader extends FrameLayout {
         mEmptyView.setVisibility(mCurrentStatus == UIStatus.EMPTY? VISIBLE :GONE);
     }
 
-    private View getEmptyView() {
+    protected View getEmptyView() {
         return LayoutInflater.from(getContext()).inflate(R.layout.fragment_empty_view, this, false);
     }
 
-    private View getNetworkErrorView() {
+    protected View getNetworkErrorView() {
         //这个时候需要找到这个View,然后提取这个代码
-        View networkErrorView =  LayoutInflater.from(getContext()).inflate(R.layout.fragment_error_view, this, false);
-        //通过这个View来找到这个控件
-        //然后设置一个点击事件
+        View networkErrorView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_error_view, this, false);
         networkErrorView.findViewById(R.id.network_error_icon).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-             // 重新去获取数据
-                //只有mOnRetryClickListener不为空的时候才去做一些事情
+                //重新获取数据
                 if (mOnRetryClickListener != null) {
                     mOnRetryClickListener.onRetryClick();
                 }
             }
         });
+
         return networkErrorView;
     }
 
     protected abstract View getSuccessView(ViewGroup container);
 
-    private View getLoadingView() {
+    protected View getLoadingView() {
         return LayoutInflater.from(getContext()).inflate(R.layout.fragment_loading_view, this, false);
     }
-
-    public void setOnRetryClickListener(OnRetryClickListener listener){
-        //设置一个成员变量,默认是空
+    public void setOnRetryClickListener(OnRetryClickListener listener) {
         this.mOnRetryClickListener = listener;
     }
 
-    //写一个接口用来处理点击调用的事件
-    public interface OnRetryClickListener{
+    public interface OnRetryClickListener {
         void onRetryClick();
     }
 }

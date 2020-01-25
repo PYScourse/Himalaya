@@ -26,7 +26,7 @@ import java.util.Map;
 
 public class MainActivity extends FragmentActivity {
 
-    private static final String TAG ="MainActivity" ;
+    private static final String TAG = "MainActivity";
     private MagicIndicator mMagicIndicator;
     private ViewPager mContentPager;
     private IndicatorAdapter mIndicatorAdapter;
