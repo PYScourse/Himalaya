@@ -21,6 +21,8 @@ public class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.In
     //创建一个时间格式的类
     private SimpleDateFormat mUpdateDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private SimpleDateFormat mDurationFormat = new SimpleDateFormat("mm:ss");
+    private ItemClickListener mItemClickListener = null;
+
     @NonNull
     @Override
     public InnerHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -30,31 +32,48 @@ public class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.In
     }
 
     @Override
-    public void onBindViewHolder(@NonNull InnerHolder holder, int position) {
+    public void onBindViewHolder(@NonNull InnerHolder holder, final int position) {
        //找到控件，设置数据
-        View itemView = holder.itemView;
+        final View itemView = holder.itemView;
 
         //顺序id
         TextView orderTv = itemView.findViewById(R.id.order_text);
         //标题
         TextView titleTv = itemView.findViewById(R.id.detail_item_title);
         //播放次数
-        TextView playCoutn = itemView.findViewById(R.id.detail_item_play_count);
+        TextView playCount = itemView.findViewById(R.id.detail_item_play_count);
         //时常
          TextView durationTv = itemView.findViewById(R.id.detail_item_duration);
          //更新日期
-        TextView updataDataTv = itemView.findViewById(R.id.detail_item_update_time);
+        TextView updateDataTv = itemView.findViewById(R.id.detail_item_update_time);
         //设置数据
         Track track = mDetailData.get(position);
         orderTv.setText(position + "");
         titleTv.setText(track.getTrackTitle());
-        playCoutn.setText(track.getPlayCount() + "");
+        playCount.setText(track.getPlayCount() + "");
 
         int durationMil = track.getDuration() * 1000;
         String duration = mDurationFormat.format(durationMil);
         durationTv.setText(duration);
         String updateTimeText = mUpdateDateFormat.format(track.getUpdatedAt());
-        updataDataTv.setText(updateTimeText);
+        updateDataTv.setText(updateTimeText);
+
+
+
+        //设置item的点击事件
+        itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+              //TODO:
+               // Toast.makeText(view.getContext(),"you click" + position + "item",Toast.LENGTH_SHORT).show();
+                //先判空，
+                if (mItemClickListener != null) {
+                    //参数需要有列表和位置
+
+                    mItemClickListener.onItemClick(mDetailData, position);
+                }
+            }
+        });
     }
 
     @Override
@@ -74,5 +93,12 @@ public class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.In
         public InnerHolder(View itemView) {
             super(itemView);
         }
+    }
+
+    public void setItemClickListener(ItemClickListener listener){
+        this.mItemClickListener = listener;
+    }
+    public interface ItemClickListener{
+        void onItemClick(List<Track> detailData, int position);
     }
 }

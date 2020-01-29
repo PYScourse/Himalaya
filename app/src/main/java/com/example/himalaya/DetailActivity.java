@@ -1,9 +1,9 @@
 package com.example.himalaya;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,10 +16,9 @@ import android.widget.TextView;
 
 import com.example.himalaya.adapters.DetailListAdapter;
 import com.example.himalaya.base.BaseActivity;
-import com.example.himalaya.interfaces.IAlbumDetailPresenter;
 import com.example.himalaya.interfaces.IAlbumDetailViewCallback;
-import com.example.himalaya.interfaces.IRecommendViewCallback;
 import com.example.himalaya.presenters.AlbumDetailPresenter;
+import com.example.himalaya.presenters.PlayerPresenter;
 import com.example.himalaya.utils.ImageBlur;
 import com.example.himalaya.utils.LogUtil;
 import com.example.himalaya.views.RoundRectImageView;
@@ -33,7 +32,7 @@ import net.lucode.hackware.magicindicator.buildins.UIUtil;
 
 import java.util.List;
 
-public class DetailActivity extends BaseActivity implements IAlbumDetailViewCallback, UILoader.OnRetryClickListener {
+public class DetailActivity extends BaseActivity implements IAlbumDetailViewCallback, UILoader.OnRetryClickListener, DetailListAdapter.ItemClickListener {
 
     private static final String TAG = "DetailActivity";
     private ImageView mLargeCover;
@@ -46,7 +45,7 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailViewCall
     private DetailListAdapter mDetailListAdapter;
     private FrameLayout mDetailListContainer;
     private UILoader mUiLoader;
-    private long mcurrentId  = -1;
+    private long mCurrentId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +110,7 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailViewCall
 
             }
         });
+        mDetailListAdapter.setItemClickListener(this);
         return detailListView;
     }
 
@@ -137,7 +137,7 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailViewCall
 
         //获取专辑的详情内容
         long id = album.getId();
-        mcurrentId  = id;
+        mCurrentId = id;
         LogUtil.d(TAG, "album -- > " + id);
         if (mAlbumDetailPresenter != null) {
             mAlbumDetailPresenter.getAlbumDetail((int) id,mCurrentPage);
@@ -190,7 +190,18 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailViewCall
     public void onRetryClick() {
         //这里面表示用户网络不佳的时候点击重新加载
         if (mAlbumDetailPresenter != null) {
-            mAlbumDetailPresenter.getAlbumDetail((int) mcurrentId,mCurrentPage);
+            mAlbumDetailPresenter.getAlbumDetail((int) mCurrentId,mCurrentPage);
         }
+    }
+
+    @Override
+    public void onItemClick(List<Track> detailData, int position) {
+        //跳转之前要设置数据
+        PlayerPresenter playerPresenter = PlayerPresenter.getPlayerPresenter();
+        playerPresenter.setPlayList(detailData, position);
+        //TODO：跳转播放器界面
+        Intent intent = new Intent(this, PlayerActivity.class);
+        startActivity(intent);
+
     }
 }

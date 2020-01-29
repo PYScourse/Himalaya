@@ -1,18 +1,20 @@
 package com.example.himalaya.base;
 
 import android.app.Application;
+import android.content.Context;
 import android.os.Handler;
 
 import com.example.himalaya.utils.LogUtil;
 import com.ximalaya.ting.android.opensdk.constants.DTransferConstants;
 import com.ximalaya.ting.android.opensdk.datatrasfer.CommonRequest;
-
+import com.ximalaya.ting.android.opensdk.player.XmPlayerManager;
 
 
 public class BaseApplication extends Application {
 
     //创建一个通用的handler
     private static Handler sHandler = null;
+    private static Context sContext = null;
 
 
     @Override
@@ -31,6 +33,9 @@ public class BaseApplication extends Application {
             mXimalaya.setPackid("com.ximalaya.qunfeng");
             mXimalaya.init(this ,mAppSecret);
         }
+        //初始化这个播放器
+        XmPlayerManager.getInstance(this).init();
+
         //初始化LogUtils
         //更改等级，使log不会被看到
        // LogUtil.init(this.getPackageName(), false);
@@ -38,7 +43,13 @@ public class BaseApplication extends Application {
 
         //然后在create的时候我们创建
         sHandler = new Handler();
+        sContext = getBaseContext();
     }
+
+    public static Context getAppContext(){
+        return sContext;
+    }
+
 
     public static Handler getHandler(){
       return sHandler;
