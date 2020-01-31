@@ -1,12 +1,18 @@
 package com.example.himalaya;
 
+import android.annotation.SuppressLint;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
+import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -15,13 +21,21 @@ import com.example.himalaya.base.BaseActivity;
 import com.example.himalaya.interfaces.IPlayerCallback;
 import com.example.himalaya.presenters.PlayerPresenter;
 import com.example.himalaya.utils.LogUtil;
+import com.example.himalaya.views.SobPobWindow;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl;
 
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class PlayerActivity extends BaseActivity implements IPlayerCallback {
+import static com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl.PlayMode.PLAY_MODEL_LIST;
+import static com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl.PlayMode.PLAY_MODEL_LIST_LOOP;
+import static com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl.PlayMode.PLAY_MODEL_RANDOM;
+import static com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl.PlayMode.PLAY_MODEL_SINGLE_LOOP;
+
+public class PlayerActivity extends BaseActivity implements IPlayerCallback, ViewPager.OnPageChangeListener {
 
     private static final String TAG = "PlayerActivity";
     private ImageView mControlBtn;
@@ -39,24 +53,45 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback {
     private String mTrackTitleText;
     private ViewPager mTrackPageView;
     private PlayerTrackPagerAdapter mTrackPagerAdapter;
+    private boolean mIsUserSlidePager = false;
+    private ImageView mPlayerModeSwitchBtn;
+
+    private XmPlayListControl.PlayMode mCurrentMode = XmPlayListControl.PlayMode.PLAY_MODEL_LIST;
+
+
+
+    private static Map<XmPlayListControl.PlayMode, XmPlayListControl.PlayMode> sPlayModeRule = new HashMap<>();
+
+    static {
+        //处理播放模式的切换
+        //1.默认的是：PLAY_MODEL_LIST
+        //2.列表循环：PLAY_MODEL_LIST_LOOP
+        //3.随机播放：PLAY_MODEL_RANDOM
+        //4.单曲循环：PLAY_MODEL_SINGLE_LOOP
+        sPlayModeRule.put(PLAY_MODEL_LIST,PLAY_MODEL_LIST_LOOP);
+        sPlayModeRule.put(PLAY_MODEL_LIST_LOOP,PLAY_MODEL_RANDOM);
+        sPlayModeRule.put(PLAY_MODEL_RANDOM,PLAY_MODEL_SINGLE_LOOP);
+        sPlayModeRule.put(PLAY_MODEL_SINGLE_LOOP,PLAY_MODEL_LIST);
+    }
+
+    private View mPlayListBtn;
+    private SobPobWindow mSobPobWindow;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
         //一进来就播放//测试
+        initView();
 
         mPlayerPresenter = PlayerPresenter.getPlayerPresenter();
         mPlayerPresenter.registerViewCallback(this);
 
         //找到方法
-        initView();
         //在界面初始化以后，才获取数据
         mPlayerPresenter.getPlayList();
         //设置监听的方法
         initEvent();
-        //默认进来就是开始播放
-        startPlay();
     }
 
 
@@ -70,18 +105,11 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback {
         }
     }
 
-    /**
-     * 开始播放
-     */
-    private void startPlay() {
-        if (mPlayerPresenter != null) {
-            mPlayerPresenter.play();
-        }
-    }
 
     /**
      * 给控件设置相关的控件
      */
+    @SuppressLint("ClickableViewAccessibility")
     private void initEvent() {
         mControlBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,6 +165,84 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback {
                 }
             }
         });
+
+
+        //设置监听事件
+        mTrackPageView.addOnPageChangeListener(this);
+        //设置事件
+        mTrackPageView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                int action = motionEvent.getAction();
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        mIsUserSlidePager = true;
+                        break;
+                }
+                return false;
+            }
+        });
+
+
+        mPlayerModeSwitchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //根据的mode获取下一个mode
+                XmPlayListControl.PlayMode playMode = sPlayModeRule.get(mCurrentMode);
+                //修改播放模式
+                if (mPlayerPresenter != null) {
+                    mPlayerPresenter.switchPlayMode(playMode);
+                }
+            }
+        });
+        mPlayListBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //todo:展示播放列表
+                mSobPobWindow.showAtLocation(v, Gravity.BOTTOM,0, 0);
+                //处理一下背景，有点透明,播放列表消失以后恢复正常
+                updateBgAlpha(0.8f);
+            }
+        });
+        mSobPobWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                //窗体消失以后，恢复透明度
+                updateBgAlpha(1.0f);
+            }
+        });
+    }
+    public void updateBgAlpha(float alpha){
+        Window window = getWindow();
+        WindowManager.LayoutParams attributes = window.getAttributes();
+        attributes.alpha = alpha;
+        window.setAttributes(attributes);
+    }
+
+    /**
+     * 根据当前状态更新播放模式图标
+     *  PLAY_MODEL_LIST
+     *  PLAY_MODEL_LIST_LOOP
+     *  PLAY_MODEL_RANDOM
+     *  PLAY_MODEL_SINGLE_LOOP
+     */
+    private void updatePlayModeBtnImg() {
+        int resId = R.drawable.selector_player_mode_list_order;
+        switch (mCurrentMode){
+            case PLAY_MODEL_LIST:
+                resId = R.drawable.selector_player_mode_list_order;
+                break;
+            case PLAY_MODEL_RANDOM:
+                resId = R.drawable.selector_player_mode_list_order_ramdom;
+                break;
+            case PLAY_MODEL_LIST_LOOP:
+                resId = R.drawable.selector_player_mode_list_order_looper;
+                break;
+            case PLAY_MODEL_SINGLE_LOOP:
+                resId = R.drawable.selector_player_mode_list_order_single_loop;
+                break;
+        }
+        mPlayerModeSwitchBtn.setImageResource(resId);
     }
 
     /**
@@ -159,6 +265,15 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback {
         //设置适配器
         mTrackPageView.setAdapter(mTrackPagerAdapter);
 
+        //找到切换模式的按钮
+        mPlayerModeSwitchBtn = this.findViewById(R.id.player_mode_switch_btn);
+
+        //播放列表
+        mPlayListBtn = this.findViewById(R.id.player_list);
+
+        //
+        mSobPobWindow = new SobPobWindow();
+
     }
 
     @Override
@@ -166,21 +281,21 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback {
         //开始播放，修改UI层暂停的按钮
         //异步需要判空
         if (mControlBtn != null) {
-            mControlBtn.setImageResource(R.mipmap.stop);
+            mControlBtn.setImageResource(R.drawable.selector_player_stop);
         }
     }
 
     @Override
     public void onPlayPause() {
         if (mControlBtn != null) {
-            mControlBtn.setImageResource(R.mipmap.play);
+            mControlBtn.setImageResource(R.drawable.selector_player_play);
         }
     }
 
     @Override
     public void onPlayStop() {
         if (mControlBtn != null) {
-            mControlBtn.setImageResource(R.mipmap.play);
+            mControlBtn.setImageResource(R.drawable.selector_player_play);
         }
     }
 
@@ -209,7 +324,9 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback {
 
     @Override
     public void onPlayModeChange(XmPlayListControl.PlayMode playMode) {
-
+        //更新播放模式，并且修改UI
+        mCurrentMode = playMode;
+        updatePlayModeBtnImg();
     }
 
     @Override
@@ -221,7 +338,7 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback {
         if (total > 1000 * 60 * 60) {
             totalDuration = mHourFormat.format(total);
             currentPosition = mHourFormat.format(currentDuration);
-        }else {
+        } else {
             totalDuration = mMinFormat.format(total);
             currentPosition = mMinFormat.format(currentDuration);
         }
@@ -251,14 +368,36 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback {
     }
 
     @Override
-    public void onTrackUpdate(Track track){
-
+    public void onTrackUpdate(Track track, int playIndex) {
         this.mTrackTitleText = track.getTrackTitle();
         if (mTrackTitleTv != null) {
             //设置当前界面的标题
             mTrackTitleTv.setText(mTrackTitleText);
         }
         //当前节目改变的时候，我们就获取当前播放中播放位置
-        //todo:
+        //当前的节目改变以后，要修改页面的图片
+        if (mTrackPageView != null) {
+            mTrackPageView.setCurrentItem(playIndex, true);
+        }
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        //当页面选中时候，就去切换播放的内容
+        LogUtil.d(TAG, "position -- >" + position);
+        if (mPlayerPresenter != null && mIsUserSlidePager) {
+            mPlayerPresenter.playByIndex(position);
+        }
+        mIsUserSlidePager = false;
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
     }
 }
