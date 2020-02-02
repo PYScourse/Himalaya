@@ -44,7 +44,6 @@
 
             <SeekBar
                 android:id="@+id/track_seek_bar"
-
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -81,7 +80,7 @@
                 android:layout_width="0dp"
                 android:layout_height="20dp"
                 android:layout_weight="1"
-                android:src="@drawable/selector_player_mode_list_order" />
+                android:src="@drawable/selector_play_mode_list_order" />
 
             <ImageView
                 android:id="@+id/play_pre"
