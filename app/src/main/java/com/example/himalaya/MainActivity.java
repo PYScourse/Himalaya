@@ -7,14 +7,21 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.himalaya.adapters.IndicatorAdapter;
 import com.example.himalaya.adapters.MainContentAdapter;
+import com.example.himalaya.interfaces.IPlayerCallback;
+import com.example.himalaya.presenters.PlayerPresenter;
 import com.example.himalaya.utils.LogUtil;
+import com.example.himalaya.views.RoundRectImageView;
 import com.ximalaya.ting.android.opensdk.datatrasfer.CommonRequest;
 import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
 import com.ximalaya.ting.android.opensdk.model.category.Category;
 import com.ximalaya.ting.android.opensdk.model.category.CategoryList;
+import com.ximalaya.ting.android.opensdk.model.track.Track;
+import com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl;
 
 import net.lucode.hackware.magicindicator.MagicIndicator;
 import net.lucode.hackware.magicindicator.ViewPagerHelper;
@@ -24,12 +31,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements IPlayerCallback {
 
     private static final String TAG = "MainActivity";
     private MagicIndicator mMagicIndicator;
     private ViewPager mContentPager;
     private IndicatorAdapter mIndicatorAdapter;
+    private RoundRectImageView mRoundRectImageView;
+    private TextView mHeaderTitle;
+    private TextView mSubTitle;
+    private ImageView mPlayControl;
+    private PlayerPresenter mPlayerPresenter;
     //提取局部变量:Ctrl+Alt+V 提取全局变量:Ctrl+Alt+F
 
     @Override
@@ -40,6 +52,13 @@ public class MainActivity extends FragmentActivity {
         initView();//创建方法
         initEven();
 
+        //
+        initPresenter();
+    }
+
+    private void initPresenter() {
+        mPlayerPresenter = PlayerPresenter.getPlayerPresenter();
+        mPlayerPresenter.registerViewCallback(this);
     }
 
     private void initEven() {
@@ -84,5 +103,93 @@ public class MainActivity extends FragmentActivity {
 
         mMagicIndicator.setNavigator(commonNavigator);
         ViewPagerHelper.bind(mMagicIndicator, mContentPager);
+
+
+        //播放控制相关的
+        mRoundRectImageView = this.findViewById(R.id.main_track_cover);
+        mHeaderTitle = this.findViewById(R.id.main_head_title);
+        mSubTitle = this.findViewById(R.id.main_sub_title);
+        mPlayControl = this.findViewById(R.id.main_play_control);
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mPlayerPresenter != null) {
+            mPlayerPresenter.unRegisterViewCallback(this);
+        }
+    }
+
+    @Override
+    public void onPlayStart() {
+
+    }
+
+    @Override
+    public void onPlayPause() {
+
+    }
+
+    @Override
+    public void onPlayStop() {
+
+    }
+
+    @Override
+    public void onPlayError() {
+
+    }
+
+    @Override
+    public void nextPlay(Track track) {
+
+    }
+
+    @Override
+    public void onPrePlay(Track track) {
+
+    }
+
+    @Override
+    public void onListLoaded(List<Track> list) {
+
+    }
+
+    @Override
+    public void onPlayModeChange(XmPlayListControl.PlayMode playMode) {
+
+    }
+
+    @Override
+    public void onProgressChange(int currentProgress, int total) {
+
+    }
+
+    @Override
+    public void onAdLoading() {
+
+    }
+
+    @Override
+    public void onFinished() {
+
+    }
+
+    @Override
+    public void onTrackUpdate(Track track, int playIndex) {
+        if (track != null) {
+            String trackTitle = track.getTrackTitle();
+            String nickname = track.getAnnouncer().getNickname();
+            String coverUrlMiddle = track.getCoverUrlMiddle();
+            LogUtil.d(TAG,"trackTitle -- >" + trackTitle);
+            LogUtil.d(TAG,"nickname -- >" + nickname);
+            LogUtil.d(TAG,"coverUrlMiddle -- >" + coverUrlMiddle);
+        }
+    }
+
+    @Override
+    public void updateListOrder(boolean isReverse) {
+
     }
 }

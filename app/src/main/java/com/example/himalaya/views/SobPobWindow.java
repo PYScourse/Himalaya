@@ -134,11 +134,11 @@ public class SobPobWindow extends PopupWindow {
 
     /**
      * 更新切换列表顺序和逆序的按钮和文字
-     * @param isOrder
+     * @param isReverse
      */
-    public void updateOrderIcon(boolean isOrder){
-        mOrderIcon.setImageResource(isOrder?R.drawable.selector_play_mode_list_order:R.drawable.selector_play_mode_list_revers);
-        mOrderText.setText(isOrder?"顺序":"逆序");
+    public void updateOrderIcon(boolean isReverse){
+        mOrderIcon.setImageResource(isReverse?R.drawable.selector_play_mode_list_order:R.drawable.selector_play_mode_list_revers);
+        mOrderText.setText(isReverse?"顺序":"逆序");
     }
 
 

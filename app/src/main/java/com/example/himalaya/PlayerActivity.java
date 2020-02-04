@@ -15,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.himalaya.adapters.PlayerTrackPagerAdapter;
 import com.example.himalaya.base.BaseActivity;
@@ -147,7 +146,7 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
             @Override
             public void onClick(View view) {
                 //TODO:
-                if (mPlayerPresenter.isPlay()) {
+                if (mPlayerPresenter.isPlaying()) {
                     //如果现在的状态是正在播放的，那么就暂停
                     mPlayerPresenter.pause();
                 } else {
@@ -219,8 +218,7 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
         mPlayerModeSwitchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
+                switchPlayMode();
             }
         });
         mPlayListBtn.setOnClickListener(new View.OnClickListener() {
@@ -261,14 +259,13 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
             @Override
             public void onOrderClick() {
                 //点击了切换顺序和逆序
-                Toast.makeText(PlayerActivity.this, "切换列表顺序",Toast.LENGTH_SHORT).show();
-                mSobPobWindow.updateOrderIcon(!textOrder);
-                textOrder = !textOrder;
+                //Toast.makeText(PlayerActivity.this, "切换列表顺序",Toast.LENGTH_SHORT).show();
+                if (mPlayerPresenter != null) {
+                    mPlayerPresenter.reversePlayList();
+                }
             }
         });
     }
-
-    private boolean textOrder = false;
 
     private void switchPlayMode() {
         //根据的mode获取下一个mode
@@ -457,6 +454,11 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
         if (mSobPobWindow != null) {
             mSobPobWindow.setCurrentPlayPosition(playIndex);
         }
+    }
+
+    @Override
+    public void updateListOrder(boolean isReverse) {
+        mSobPobWindow.updateOrderIcon(isReverse);
     }
 
     @Override
