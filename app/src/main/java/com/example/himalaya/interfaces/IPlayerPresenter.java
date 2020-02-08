@@ -61,4 +61,11 @@ public interface IPlayerPresenter extends IBasePresenter<IPlayerCallback> {
      * 把播放器列表反转
      */
     void reversePlayList();
+
+
+    /**
+     * 播放专辑的第一个节目
+     * @param id
+     */
+    void playByAlbumId(long id);
 }

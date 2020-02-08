@@ -345,7 +345,7 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
         //开始播放，修改UI层暂停的按钮
         //异步需要判空
         if (mControlBtn != null) {
-            mControlBtn.setImageResource(R.drawable.selector_player_stop);
+            mControlBtn.setImageResource(R.drawable.selector_player_pause);
         }
     }
 
@@ -440,6 +440,10 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
 
     @Override
     public void onTrackUpdate(Track track, int playIndex) {
+        if (track == null) {
+            LogUtil.d(TAG,"onTrackUpdate -- >");
+            return;
+        }
         this.mTrackTitleText = track.getTrackTitle();
         if (mTrackTitleTv != null) {
             //设置当前界面的标题

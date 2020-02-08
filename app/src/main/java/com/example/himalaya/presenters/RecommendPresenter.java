@@ -2,6 +2,7 @@ package com.example.himalaya.presenters;
 
 import android.support.annotation.Nullable;
 
+import com.example.himalaya.api.XimalayApi;
 import com.example.himalaya.interfaces.IRecommendPresenter;
 import com.example.himalaya.interfaces.IRecommendViewCallback;
 import com.example.himalaya.utils.Constants;
@@ -21,6 +22,7 @@ public class RecommendPresenter implements IRecommendPresenter {
     private static final String TAG = "RecommendPresenter";
 
     private List<IRecommendViewCallback> mCallbacks = new ArrayList<>();
+    private List<Album> mCurrentRecommend = null;
 
     //构造方法私有化
     private RecommendPresenter(){
@@ -49,6 +51,13 @@ public class RecommendPresenter implements IRecommendPresenter {
 
 
     /**
+     * 获取当前的推荐专辑列表
+     * @return  推荐专辑列表，使用之前要判空
+     */
+    public List<Album> getCurrentRecommend(){
+        return mCurrentRecommend;
+    }
+    /**
      * 获取推荐内容，其实就是猜你喜欢
      * 这个接口：3.10.6 获取猜你喜欢专辑
      */
@@ -58,10 +67,10 @@ public class RecommendPresenter implements IRecommendPresenter {
         //获取推荐内容
         //封装参数
         updateLoading();
-        Map<String, String> map = new HashMap<>();
-        //这个数据表示一页参数返回多少条
-        map.put(DTransferConstants.LIKE_COUNT, Constants.COUNT_RECOMMEND + "");//转化成字符串
-        CommonRequest.getGuessLikeAlbum(map, new IDataCallBack<GussLikeAlbumList>() {
+
+
+        XimalayApi ximalayApi = XimalayApi.getXimalayApi();
+        ximalayApi.getRecommendList(new IDataCallBack<GussLikeAlbumList>() {
             @Override
             public void onSuccess(@Nullable GussLikeAlbumList gussLikeAlbumList) {
                 //这里是数据获取成功
@@ -109,6 +118,8 @@ public class RecommendPresenter implements IRecommendPresenter {
                 for (IRecommendViewCallback callback : mCallbacks) {
                     callback.onRecommendListLoaded(albumList);//把albumList传出去
                 }
+                //给播放推荐的第一首歌那一部分一个引用
+                this.mCurrentRecommend = albumList;
             }
         }
     }
@@ -143,7 +154,7 @@ public class RecommendPresenter implements IRecommendPresenter {
     public void unRegisterViewCallback(IRecommendViewCallback callback) {
         //清除
         if (mCallbacks != null) {
-            mCallbacks.remove(mCallbacks);
+            mCallbacks.remove(callback);
         }
     }
 }

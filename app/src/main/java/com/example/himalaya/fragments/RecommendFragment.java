@@ -10,25 +10,26 @@ import android.view.ViewGroup;
 
 import com.example.himalaya.DetailActivity;
 import com.example.himalaya.R;
-import com.example.himalaya.adapters.RecommendListAdapter;
+import com.example.himalaya.adapters.AlbumListAdapter;
 import com.example.himalaya.base.BaseFragment;
 import com.example.himalaya.interfaces.IRecommendViewCallback;
 import com.example.himalaya.presenters.AlbumDetailPresenter;
 import com.example.himalaya.presenters.RecommendPresenter;
 import com.example.himalaya.utils.LogUtil;
 import com.example.himalaya.views.UILoader;
+import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 
 import net.lucode.hackware.magicindicator.buildins.UIUtil;
 
 import java.util.List;
 
-public class RecommendFragment extends BaseFragment implements IRecommendViewCallback, UILoader.OnRetryClickListener, RecommendListAdapter.OnRecommendItemClickListener {
+public class RecommendFragment extends BaseFragment implements IRecommendViewCallback, UILoader.OnRetryClickListener, AlbumListAdapter.OnAlbumItemClickListener {
 
     private static final String TAG = "RecommendFragment";
     private View mRootView;
     private RecyclerView mRecommendRv;
-    private RecommendListAdapter mRecommendListAdapter;
+    private AlbumListAdapter mRecommendListAdapter;
     private RecommendPresenter mRecommendPresenter;
     private UILoader mUiLoader;
 
@@ -68,6 +69,8 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
         //RecycleView的使用
         //1.找到对应的控件
         mRecommendRv = mRootView.findViewById(R.id.recommend_list);
+        TwinklingRefreshLayout twinklingRefreshLayout = mRootView.findViewById(R.id.over_scroll_view);
+        twinklingRefreshLayout.setPureScrollModeOn();
         //2.设置布局管理器
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         //设置方向
@@ -87,9 +90,9 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
         });
 
         //3.设置适配器
-        mRecommendListAdapter = new RecommendListAdapter();//设置为成员变量，等会要设置数据
+        mRecommendListAdapter = new AlbumListAdapter();//设置为成员变量，等会要设置数据
         mRecommendRv.setAdapter(mRecommendListAdapter);
-        mRecommendListAdapter.setOnRecommendItemClickListener(this);//让这个类实现当前这个接口
+        mRecommendListAdapter.setAlbumItemClickListener(this);//让这个类实现当前这个接口
         return mRootView;
 
     }
