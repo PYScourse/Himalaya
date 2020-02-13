@@ -16,7 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.himalaya.adapters.DetailListAdapter;
+import com.example.himalaya.adapters.TrackListAdapter;
 import com.example.himalaya.base.BaseActivity;
 import com.example.himalaya.base.BaseApplication;
 import com.example.himalaya.interfaces.IAlbumDetailViewCallback;
@@ -44,11 +44,7 @@ import net.lucode.hackware.magicindicator.buildins.UIUtil;
 
 import java.util.List;
 
-/**
- * Created by TrillGates on 2019/1/17.
- * God bless my code!
- */
-public class DetailActivity extends BaseActivity implements IAlbumDetailViewCallback, UILoader.OnRetryClickListener, DetailListAdapter.ItemClickListener, IPlayerCallback, ISubscriptionCallback {
+public class DetailActivity extends BaseActivity implements IAlbumDetailViewCallback, UILoader.OnRetryClickListener, TrackListAdapter.ItemClickListener, IPlayerCallback, ISubscriptionCallback {
 
     private static final String TAG = "DetailActivity";
     private ImageView mLargeCover;
@@ -58,7 +54,7 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailViewCall
     private AlbumDetailPresenter mAlbumDetailPresenter;
     private int mCurrentPage = 1;
     private RecyclerView mDetailList;
-    private DetailListAdapter mDetailListAdapter;
+    private TrackListAdapter mDetailListAdapter;
     private FrameLayout mDetailListContainer;
     private UILoader mUiLoader;
     private long mCurrentId = -1;
@@ -211,7 +207,7 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailViewCall
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mDetailList.setLayoutManager(layoutManager);
         //第二步:设置适配器
-        mDetailListAdapter = new DetailListAdapter();
+        mDetailListAdapter = new TrackListAdapter();
         mDetailList.setAdapter(mDetailListAdapter);
         //设置item的上下间距
         mDetailList.addItemDecoration(new RecyclerView.ItemDecoration() {

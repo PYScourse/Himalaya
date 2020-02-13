@@ -30,14 +30,14 @@ import net.lucode.hackware.magicindicator.buildins.UIUtil;
 
 import java.util.List;
 
-public class SubscriptionFragment extends BaseFragment implements ISubscriptionCallback, AlbumListAdapter.OnAlbumItemClickListener,
-        AlbumListAdapter.OnAlbumItemLongClickListener, ConfirmDialog.OnDialogActionClickListener {
+public class SubscriptionFragment extends BaseFragment implements ISubscriptionCallback, AlbumListAdapter.OnAlbumItemClickListener, AlbumListAdapter.OnAlbumItemLongClickListener, ConfirmDialog.OnDialogActionClickListener {
 
     private ISubscriptionPresenter mSubscriptionPresenter;
     private RecyclerView mSubListView;
     private AlbumListAdapter mAlbumListAdapter;
     private Album mCurrentClickAlbum = null;
     private UILoader mUiLoader;
+
 
     @Override
     protected View onSubViewLoaded(LayoutInflater layoutInflater, ViewGroup container) {
@@ -63,13 +63,11 @@ public class SubscriptionFragment extends BaseFragment implements ISubscriptionC
             }
             rootView.addView(mUiLoader);
         }
-
         return rootView;
     }
 
     private View createSuccessView() {
-        View itemView = LayoutInflater.from(BaseApplication.getAppContext()).inflate(R.layout.item_subscription,null);
-
+        View itemView = LayoutInflater.from(BaseApplication.getAppContext()).inflate(R.layout.item_subscription, null);
         TwinklingRefreshLayout refreshLayout = itemView.findViewById(R.id.over_scroll_view);
         refreshLayout.setEnableLoadmore(false);
         refreshLayout.setEnableRefresh(false);
@@ -78,12 +76,10 @@ public class SubscriptionFragment extends BaseFragment implements ISubscriptionC
         mSubListView.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                outRect.top = UIUtil.dip2px(view.getContext(), 5);
                 outRect.bottom = UIUtil.dip2px(view.getContext(), 5);
-                //dp -> px
-                outRect.top = UIUtil.dip2px(view.getContext(), 5);//magicindicator.buildins,一个工具类
                 outRect.left = UIUtil.dip2px(view.getContext(), 5);
                 outRect.right = UIUtil.dip2px(view.getContext(), 5);
-
             }
         });
         //
@@ -97,7 +93,6 @@ public class SubscriptionFragment extends BaseFragment implements ISubscriptionC
         if (mUiLoader != null) {
             mUiLoader.updateStatus(UILoader.UIStatus.LOADING);
         }
-
         return itemView;
     }
 
@@ -108,23 +103,21 @@ public class SubscriptionFragment extends BaseFragment implements ISubscriptionC
 
     @Override
     public void onDeleteResult(boolean isSuccess) {
-        //给出取消订阅的提示
-        Toast.makeText(BaseApplication.getAppContext(), isSuccess ? R.string.cancel_sub_success: R.string.cancel_sub_failed, Toast.LENGTH_SHORT).show();
+        //给出取消订阅的提示.
+        Toast.makeText(BaseApplication.getAppContext(), isSuccess ? R.string.cancel_sub_success : R.string.cancel_sub_failed, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onSubscriptionsLoaded(List<Album> albums) {
-        if (albums.size()==0) {
+        if (albums.size() == 0) {
             if (mUiLoader != null) {
                 mUiLoader.updateStatus(UILoader.UIStatus.EMPTY);
             }
-        }else {
+        } else {
             if (mUiLoader != null) {
                 mUiLoader.updateStatus(UILoader.UIStatus.SUCCESS);
             }
         }
-
-
 
         //更新UI
         if (mAlbumListAdapter != null) {
@@ -140,7 +133,7 @@ public class SubscriptionFragment extends BaseFragment implements ISubscriptionC
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        //取消接口的注册，避免内存泄漏
+        //取消接口的注册
         if (mSubscriptionPresenter != null) {
             mSubscriptionPresenter.unRegisterViewCallback(this);
         }
@@ -149,9 +142,8 @@ public class SubscriptionFragment extends BaseFragment implements ISubscriptionC
 
     @Override
     public void onItemClick(int position, Album album) {
-        //根据位置拿到数据
         AlbumDetailPresenter.getInstance().setTargetAlbum(album);
-        //item被点击了,跳转到详情界面,之后就要绑定回调接口
+        //item被点击了，跳转到详情界面
         Intent intent = new Intent(getContext(), DetailActivity.class);
         startActivity(intent);
     }
@@ -159,8 +151,8 @@ public class SubscriptionFragment extends BaseFragment implements ISubscriptionC
     @Override
     public void onItemLongClick(Album album) {
         this.mCurrentClickAlbum = album;
-        //订阅的item被长按了
-        //Toast.makeText(BaseApplication.getAppContext(),"订阅被长按",Toast.LENGTH_SHORT).show();
+        //订阅的item被长按了.
+        // Toast.makeText(BaseApplication.getAppContext(), "订阅被长按.", Toast.LENGTH_SHORT).show();
         ConfirmDialog confirmDialog = new ConfirmDialog(getActivity());
         confirmDialog.setOnDialogActionClickListener(this);
         confirmDialog.show();
@@ -168,7 +160,7 @@ public class SubscriptionFragment extends BaseFragment implements ISubscriptionC
 
     @Override
     public void onCancelSubClick() {
-        //取消订阅
+        //取消订阅内容
         if (mCurrentClickAlbum != null && mSubscriptionPresenter != null) {
             mSubscriptionPresenter.deleteSubscription(mCurrentClickAlbum);
         }

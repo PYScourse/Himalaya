@@ -1,11 +1,9 @@
 package com.example.himalaya;
 
 import android.content.Intent;
-import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,18 +12,13 @@ import android.widget.TextView;
 
 import com.example.himalaya.adapters.IndicatorAdapter;
 import com.example.himalaya.adapters.MainContentAdapter;
-import com.example.himalaya.data.XimalayaDBHelper;
 import com.example.himalaya.interfaces.IPlayerCallback;
 import com.example.himalaya.presenters.PlayerPresenter;
 import com.example.himalaya.presenters.RecommendPresenter;
 import com.example.himalaya.utils.LogUtil;
 import com.example.himalaya.views.RoundRectImageView;
 import com.squareup.picasso.Picasso;
-import com.ximalaya.ting.android.opensdk.datatrasfer.CommonRequest;
-import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
-import com.ximalaya.ting.android.opensdk.model.category.Category;
-import com.ximalaya.ting.android.opensdk.model.category.CategoryList;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl;
 
@@ -33,9 +26,7 @@ import net.lucode.hackware.magicindicator.MagicIndicator;
 import net.lucode.hackware.magicindicator.ViewPagerHelper;
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.CommonNavigator;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends FragmentActivity implements IPlayerCallback {
 
@@ -58,7 +49,7 @@ public class MainActivity extends FragmentActivity implements IPlayerCallback {
         setContentView(R.layout.activity_main);
 
         initView();//创建方法
-        initEven();
+        initEvent();
 
         //
         initPresenter();
@@ -69,14 +60,14 @@ public class MainActivity extends FragmentActivity implements IPlayerCallback {
         mPlayerPresenter.registerViewCallback(this);
     }
 
-    private void initEven() {
+    private void initEvent() {
         //设置监听
         mIndicatorAdapter.setOnIndicatorTapClickListener(new IndicatorAdapter.OnIndicatorTapClickListener() {
             @Override
             public void onTabClick(int index) {
                 Log.d(TAG, "click index is -->" + index);
                 if (mContentPager != null) {
-                    mContentPager.setCurrentItem(index);
+                    mContentPager.setCurrentItem(index,false);
                 }
             }
         });

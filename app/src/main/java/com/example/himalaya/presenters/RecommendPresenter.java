@@ -77,13 +77,12 @@ public class RecommendPresenter implements IRecommendPresenter {
             public void onSuccess(@Nullable GussLikeAlbumList gussLikeAlbumList) {
                 //这里是数据获取成功
                 if (gussLikeAlbumList != null) {
-                    List<Album> albumList = gussLikeAlbumList.getAlbumList();
-                    if (albumList != null) {
+                    LogUtil.d(TAG,"getRecommendList -- > from network.");
+                    mRecommendList = gussLikeAlbumList.getAlbumList();
                         //数据回来以后，我们要去更新UI
                         //upRecommendUI(albumList);
                         //通知
-                        handlerRecommendResult(albumList);
-                    }
+                        handlerRecommendResult(mRecommendList);
                 }
             }
 

@@ -104,14 +104,19 @@ public class SubscriptionDao implements ISubDao {
                 //封面图片
                 String coverUrl = query.getString(query.getColumnIndex(Constants.SUB_COVER_URL));
                 album.setCoverUrlLarge(coverUrl);
+                //
                 String title = query.getString(query.getColumnIndex(Constants.SUB_TITLE));
                 album.setAlbumTitle(title);
+                //
                 String description = query.getString(query.getColumnIndex(Constants.SUB_DESCRIPTION));
                 album.setAlbumIntro(description);
+                //
                 int tracksCount = query.getInt(query.getColumnIndex(Constants.SUB_TRACKS_COUNT));
                 album.setIncludeTrackCount(tracksCount);
+                //
                 int playCount = query.getInt(query.getColumnIndex(Constants.SUB_PLAY_COUNT));
                 album.setPlayCount(playCount);
+                //
                 int albumId = query.getInt(query.getColumnIndex(Constants.SUB_ALBUM_ID));
                 album.setId(albumId);
                 String authorName = query.getString(query.getColumnIndex(Constants.SUB_AUTHOR_NAME));

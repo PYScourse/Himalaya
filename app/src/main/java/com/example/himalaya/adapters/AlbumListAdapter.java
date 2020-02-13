@@ -120,9 +120,6 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.Inne
     public void setAlbumItemClickListener(OnAlbumItemClickListener listener){
         this.mItemClickListener = listener;
     }
-    /**
-     * item长按的接口
-     */
     public interface OnAlbumItemClickListener {
         void onItemClick(int position, Album album);//把位置传出去
         //

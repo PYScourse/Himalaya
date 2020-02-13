@@ -158,4 +158,3 @@ public class SubscriptionPresenter implements ISubscriptionPresenter, ISubDaoCal
         });
     }
 }
-

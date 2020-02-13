@@ -9,10 +9,6 @@ import android.widget.ImageView;
 
 import com.example.himalaya.R;
 
-/**
- * Created by TrillGates on 2019/1/4.
- * God bless my code!
- */
 @SuppressLint("AppCompatCustomView")
 public class LoadingView extends ImageView {
 
