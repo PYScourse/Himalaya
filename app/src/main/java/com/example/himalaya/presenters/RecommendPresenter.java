@@ -2,30 +2,26 @@ package com.example.himalaya.presenters;
 
 import android.support.annotation.Nullable;
 
-import com.example.himalaya.api.XimalayApi;
+import com.example.himalaya.data.XimalayApi;
 import com.example.himalaya.interfaces.IRecommendPresenter;
 import com.example.himalaya.interfaces.IRecommendViewCallback;
-import com.example.himalaya.utils.Constants;
 import com.example.himalaya.utils.LogUtil;
-import com.ximalaya.ting.android.opensdk.constants.DTransferConstants;
-import com.ximalaya.ting.android.opensdk.datatrasfer.CommonRequest;
 import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 import com.ximalaya.ting.android.opensdk.model.album.GussLikeAlbumList;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class RecommendPresenter implements IRecommendPresenter {
     private static final String TAG = "RecommendPresenter";
 
     private List<IRecommendViewCallback> mCallbacks = new ArrayList<>();
     private List<Album> mCurrentRecommend = null;
+    private List<Album> mRecommendList;
 
     //构造方法私有化
-    private RecommendPresenter(){
+    private RecommendPresenter() {
 
     }
 
@@ -36,10 +32,10 @@ public class RecommendPresenter implements IRecommendPresenter {
      *
      * @return
      */
-    public static RecommendPresenter getInstance(){
+    public static RecommendPresenter getInstance() {
         //懒汉式单例
-        if (sInstance==null) {
-            synchronized (RecommendPresenter.class){
+        if (sInstance == null) {
+            synchronized (RecommendPresenter.class) {
                 if (sInstance == null) {
                     sInstance = new RecommendPresenter();
                 }
@@ -52,11 +48,13 @@ public class RecommendPresenter implements IRecommendPresenter {
 
     /**
      * 获取当前的推荐专辑列表
-     * @return  推荐专辑列表，使用之前要判空
+     *
+     * @return 推荐专辑列表，使用之前要判空
      */
-    public List<Album> getCurrentRecommend(){
+    public List<Album> getCurrentRecommend() {
         return mCurrentRecommend;
     }
+
     /**
      * 获取推荐内容，其实就是猜你喜欢
      * 这个接口：3.10.6 获取猜你喜欢专辑
@@ -64,11 +62,15 @@ public class RecommendPresenter implements IRecommendPresenter {
     @Override
     public void getRecommendList() {
         //为了使内容返回进来要注册一个接口进来
+        //如果内容不空的话，那么直接使用当前的内容
+        if(mRecommendList != null && mRecommendList.size() > 0) {
+            LogUtil.d(TAG,"getRecommendList -- > from list.");
+            handlerRecommendResult(mRecommendList);
+            return;
+        }
         //获取推荐内容
         //封装参数
         updateLoading();
-
-
         XimalayApi ximalayApi = XimalayApi.getXimalayApi();
         ximalayApi.getRecommendList(new IDataCallBack<GussLikeAlbumList>() {
             @Override
@@ -114,7 +116,7 @@ public class RecommendPresenter implements IRecommendPresenter {
                 for (IRecommendViewCallback callback : mCallbacks) {
                     callback.onEmpty();//把albumList传出去
                 }
-            }else {
+            } else {
                 for (IRecommendViewCallback callback : mCallbacks) {
                     callback.onRecommendListLoaded(albumList);//把albumList传出去
                 }
@@ -125,7 +127,7 @@ public class RecommendPresenter implements IRecommendPresenter {
     }
 
 
-    private void updateLoading(){
+    private void updateLoading() {
         for (IRecommendViewCallback callback : mCallbacks) {
             callback.onLoading();//把albumList传出去
         }
@@ -144,7 +146,7 @@ public class RecommendPresenter implements IRecommendPresenter {
 
     @Override
     public void registerViewCallback(IRecommendViewCallback callback) {
-        if (mCallbacks!=null && !mCallbacks.contains(callback)) {
+        if (mCallbacks != null && !mCallbacks.contains(callback)) {
             //防止重复加入
             mCallbacks.add(callback);
         }

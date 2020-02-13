@@ -1,24 +1,18 @@
 package com.example.himalaya.presenters;
 
-import android.nfc.Tag;
 import android.support.annotation.Nullable;
 
-import com.example.himalaya.api.XimalayApi;
+import com.example.himalaya.data.XimalayApi;
 import com.example.himalaya.interfaces.IAlbumDetailPresenter;
 import com.example.himalaya.interfaces.IAlbumDetailViewCallback;
-import com.example.himalaya.utils.Constants;
 import com.example.himalaya.utils.LogUtil;
-import com.ximalaya.ting.android.opensdk.constants.DTransferConstants;
-import com.ximalaya.ting.android.opensdk.datatrasfer.CommonRequest;
 import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.ximalaya.ting.android.opensdk.model.track.TrackList;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class AlbumDetailPresenter implements IAlbumDetailPresenter {
     private static final String TAG = "AlbumDetailPresenter";
@@ -31,13 +25,14 @@ public class AlbumDetailPresenter implements IAlbumDetailPresenter {
     private int mCurrentPageIndex = 0;
 
     //懒汉式单例模式
-    private AlbumDetailPresenter(){
+    private AlbumDetailPresenter() {
     }
+
     private static AlbumDetailPresenter sInstance = null;
 
-    public static AlbumDetailPresenter getInstance(){
+    public static AlbumDetailPresenter getInstance() {
         if (sInstance == null) {
-            synchronized (AlbumDetailPresenter.class){
+            synchronized (AlbumDetailPresenter.class) {
                 if (sInstance == null) {
                     sInstance = new AlbumDetailPresenter();
                 }
@@ -45,6 +40,7 @@ public class AlbumDetailPresenter implements IAlbumDetailPresenter {
         }
         return sInstance;
     }
+
     @Override
     public void pull2RefreshMore() {
 
@@ -58,7 +54,7 @@ public class AlbumDetailPresenter implements IAlbumDetailPresenter {
         doLoaded(true);
     }
 
-    private void doLoaded(final boolean isLoaderMore){
+    private void doLoaded(final boolean isLoaderMore) {
         XimalayApi ximalayApi = XimalayApi.getXimalayApi();
         ximalayApi.getAlbumDetail(new IDataCallBack<TrackList>() {
             @Override
@@ -70,22 +66,21 @@ public class AlbumDetailPresenter implements IAlbumDetailPresenter {
                     LogUtil.d(TAG, "tracks  size -->" + tracks.size());
                     //通过集合来通知UI更新
                     //添加一个参数
-
                     if (isLoaderMore) {
                         //上拉加载，结果放到后面去
                         mTracks.addAll(tracks);
                         int size = tracks.size();
                         handlerLoaderMoreResult(size);
-                    }else {
+                    } else {
                         //这个是下拉加载，结果放到前面去
-                        mTracks.addAll(0,tracks);
+                        mTracks.addAll(0, tracks);
                     }
                     handlerAlbumDetailResult(mTracks);
                 }
             }
 
             @Override
-            public void onError(int errorCode, String errorMsg)  {
+            public void onError(int errorCode, String errorMsg) {
                 if (isLoaderMore) {
                     mCurrentPageIndex--;
                 }
@@ -93,12 +88,13 @@ public class AlbumDetailPresenter implements IAlbumDetailPresenter {
                 LogUtil.d(TAG, "errorMsg -- >" + errorMsg);
                 handlerError(errorCode, errorMsg);
             }
-        },mCurrentAlbumId, mCurrentPageIndex);
+        }, mCurrentAlbumId, mCurrentPageIndex);
 
     }
 
     /**
      * 处理加载更多的结果
+     *
      * @param size
      */
     private void handlerLoaderMoreResult(int size) {
@@ -120,12 +116,13 @@ public class AlbumDetailPresenter implements IAlbumDetailPresenter {
     /**
      * 这样数据就可以回去UI上了
      * 如果是发生错误，就通知UI
+     *
      * @param errorCode
      * @param errorMsg
      */
     private void handlerError(int errorCode, String errorMsg) {
         for (IAlbumDetailViewCallback callback : mCallbacks) {
-            callback.onNetWorkError(errorCode,errorMsg);
+            callback.onNetWorkError(errorCode, errorMsg);
         }
     }
 
@@ -151,7 +148,7 @@ public class AlbumDetailPresenter implements IAlbumDetailPresenter {
     }
 
     //加载的目标的一个专辑
-    public void setTargetAlbum(Album targetAlbum){
-      this.mTargetAlbum = targetAlbum;
+    public void setTargetAlbum(Album targetAlbum) {
+        this.mTargetAlbum = targetAlbum;
     }
 }

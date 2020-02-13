@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="75dp"
-    android:background="@drawable/shape_ablum_item_bg">
+    android:background="@drawable/shape_album_item_bg">
 
     <com.example.himalaya.views.RoundRectImageView
         android:id="@+id/album_cover"

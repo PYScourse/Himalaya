@@ -1,8 +1,6 @@
 package com.example.himalaya.adapters;
-
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
-import android.support.v7.view.menu.MenuView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerTrackPagerAdapter extends PagerAdapter {
+
+    private List<Track> mData = new ArrayList<>();
+
     @NonNull
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
@@ -34,10 +35,9 @@ public class PlayerTrackPagerAdapter extends PagerAdapter {
 
     @Override
     public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
-           container.removeView((View) object);
+        container.removeView((View) object);
     }
 
-    private List<Track> mData = new ArrayList<>();
     @Override
     public int getCount() {
         return mData.size();

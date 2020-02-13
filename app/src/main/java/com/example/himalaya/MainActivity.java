@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.example.himalaya.adapters.IndicatorAdapter;
 import com.example.himalaya.adapters.MainContentAdapter;
+import com.example.himalaya.data.XimalayaDBHelper;
 import com.example.himalaya.interfaces.IPlayerCallback;
 import com.example.himalaya.presenters.PlayerPresenter;
 import com.example.himalaya.presenters.RecommendPresenter;
@@ -111,7 +112,6 @@ public class MainActivity extends FragmentActivity implements IPlayerCallback {
                 if (!hasPlayList) {
                     playFirstRecommend();
                 }
-
                 startActivity(new Intent(MainActivity.this, PlayerActivity.class));
             }
         });

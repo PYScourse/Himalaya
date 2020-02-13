@@ -45,7 +45,6 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.Inne
                 if (mItemClickListener != null) {
                     int clickPosition = (int) v.getTag();
                     mItemClickListener.onItemClick(clickPosition,mData.get(clickPosition));
-
                 }
                 //设置log,观察点击的对不对
                 Log.d(TAG, "  holder.itemView   click ---> " + v.getTag());
@@ -53,6 +52,19 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.Inne
         });
         //在这里加上一个值
         holder.setData(mData.get(position));
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                //长按要取消判空
+                if (mLongClickListener != null) {
+                    int clickPosition = (int) v.getTag();
+                    mLongClickListener.onItemLongClick(mData.get(clickPosition));
+                }
+                //true表示消费掉该事件
+                return true;
+
+            }
+        });
     }
 
     @Override
@@ -108,21 +120,23 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.Inne
     public void setAlbumItemClickListener(OnAlbumItemClickListener listener){
         this.mItemClickListener = listener;
     }
+    /**
+     * item长按的接口
+     */
     public interface OnAlbumItemClickListener {
         void onItemClick(int position, Album album);//把位置传出去
+        //
+
     }
 
 
     public void setOnAlbumItemLongClickListener(OnAlbumItemLongClickListener listener){
         this.mLongClickListener = listener;
     }
-
     /**
-     * item长按的接口
+     * item 长按的接口
      */
     public interface OnAlbumItemLongClickListener{
         void onItemLongClick(Album album);
     }
-
-
 }

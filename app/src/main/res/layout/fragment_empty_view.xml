@@ -16,8 +16,10 @@
             android:src="@mipmap/content_empty"
             android:layout_height="75dp" />
         <TextView
+            android:id="@+id/empty_view_tips_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="18sp"
             android:layout_centerInParent="true"
             android:layout_marginTop="9dp"
             android:text="没有内容哦" />

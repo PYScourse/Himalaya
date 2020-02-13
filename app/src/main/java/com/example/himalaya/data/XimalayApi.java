@@ -1,4 +1,4 @@
-package com.example.himalaya.api;
+package com.example.himalaya.data;
 
 import com.example.himalaya.utils.Constants;
 import com.ximalaya.ting.android.opensdk.constants.DTransferConstants;
@@ -97,7 +97,7 @@ public class XimalayApi {
      * @param callback 回调
      */
     public void getSuggestWord(String keyword, IDataCallBack<SuggestWords> callback) {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put(DTransferConstants.SEARCH_KEY, keyword);
         CommonRequest.getSuggestWord(map, callback);
     }
